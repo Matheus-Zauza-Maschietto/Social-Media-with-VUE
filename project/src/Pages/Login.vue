@@ -2,7 +2,7 @@
     <div id="login">
         <div class="loginArea" v-if="login">
             <h1>entrar</h1>
-            <form action="" @submit.prevent="">
+            <form action="" @submit.prevent="handleLogin">
                 <input type="text" placeholder="email@email.com" v-model="email">
                 <input type="password" placeholder="Sua senha" v-model="password">
                 <button type="submit">Acessar</button>
@@ -24,9 +24,9 @@
 </template>
 
 <script>
-import db from '../Services/firebaseConnection.js'
-//import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth'
-import { collection, addDoc } from '@firebase/firestore'
+import {db, app} from '../Services/firebaseConnection.js'
+import {getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword} from 'firebase/auth'
+import {setDoc, doc, collection, getDoc} from '@firebase/firestore'
 
 export default {
     name: 'loginView',
@@ -46,30 +46,30 @@ export default {
             this.nome = ''
         },
         async handleRegister(){
-            // const {user} = await createUserWithEmailAndPassword(getAuth(), this.email, this.password)
-            // console.log(db)
-            // addDoc(collection("users"), {
-            //     nome: this.nome
-            // })
-            // .then(async () => {
-            //     const usuarioLogado = {
-            //         uid: user.uid,
-            //         nome: this.nome
-            //     }
-            //     console.log(usuarioLogado)
-            //     localStorage.setItem('devpost', JSON.stringify(usuarioLogado))
-            // })
-            // .catch(()=>{
-            //     console.log("Deu erro no cadastro")
-            // })
-
-            // this.$router.push('/')
-            await addDoc(collection(db, "users"), {
-                first: "Alan",
-                middle: "Mathison",
-                last: "Turing",
-                born: 1912
-            });
+            const {user} = await createUserWithEmailAndPassword(getAuth(), this.email, this.password)
+            await setDoc(doc(db, "users", user.uid), 
+            {
+                nome: this.nome
+            })
+            .then(async () => 
+                {
+                    const usuarioLogado = {
+                        nome: this.nome
+                    }
+                    localStorage.setItem('devpost', JSON.stringify(usuarioLogado))
+                })
+            .catch((e) => 
+                {
+                    console.log("ERRO AO CADASTRAR: "+e)
+                })
+            this.$router.push('/')
+        },
+        async handleLogin(){
+            const {user} = await signInWithEmailAndPassword(getAuth(app), this.email, this.password);
+            const userProfile = await getDoc(doc(collection(db, 'users'), user.uid))
+            user.reload()
+            localStorage.setItem('devpost', JSON.stringify({uid: userProfile.id, nome: userProfile.data().nome}))
+            this.$router.push('/')
         }
     }
 }
