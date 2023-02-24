@@ -67,7 +67,6 @@ export default {
         async handleLogin(){
             const {user} = await signInWithEmailAndPassword(getAuth(app), this.email, this.password);
             const userProfile = await getDoc(doc(collection(db, 'users'), user.uid))
-            user.reload()
             localStorage.setItem('devpost', JSON.stringify({uid: userProfile.id, nome: userProfile.data().nome}))
             this.$router.push('/')
         }

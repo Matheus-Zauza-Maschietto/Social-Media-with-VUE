@@ -33,7 +33,7 @@
 
 <script>
 import {db} from '../Services/firebaseConnection.js'
-import {collection, addDoc, setDoc, doc, onSnapshot, orderBy, getDoc } from 'firebase/firestore'
+import {collection, addDoc, doc, onSnapshot, orderBy, getDoc, deleteDoc, updateDoc, setDoc } from 'firebase/firestore'
 
 export default {
     name: 'homeView',
@@ -101,19 +101,26 @@ export default {
         async likePost(id, likes){
             const userId = this.user.uid
             const likeId = userId+"_"+id
-
+            console.log(likeId)
             const document = await getDoc(doc(collection(db, 'likes'), likeId))
-            if(document.data() !== undefined)
+            console.log(document.exists())
+            if(document.exists())
             {
-                setDoc(doc(db, "posts", id), 
+                updateDoc(doc(db, "posts", id), 
+                {
+                    likes: likes-1
+                })
+                deleteDoc(doc(db, "likes", likeId))
+            }
+            else{
+                updateDoc(doc(db, "posts", id), 
                 {
                     likes: likes+1
                 })
+                let document = doc(db, 'likes', likeId)
+                setDoc(document, {})
             }
         }
-    },
-    computed: {
-
     }
 }
 </script>
