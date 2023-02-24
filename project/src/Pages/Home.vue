@@ -19,11 +19,11 @@
             <article class="post" v-for="post in posts" :key="post.id">
                 <h1>{{ post.autor }}</h1>
                 <p>
-                    {{ postLength(post.content) }}
+                    {{ Max200Length(post.content) }}
                 </p>
 
                 <div class="action-post">
-                    <button> {{ post.likes == 0 ? 'curtir' : post.likes + " curtidas"}}</button>
+                    <button @click="likePost(post.id, post.likes)"> {{ post.likes == 0 ? 'curtir' : post.likes + " curtidas"}}</button>
                     <button>Veja post completo</button>
                 </div>
             </article>
@@ -33,7 +33,7 @@
 
 <script>
 import {db} from '../Services/firebaseConnection.js'
-import {collection, addDoc, onSnapshot } from 'firebase/firestore'
+import {collection, addDoc, setDoc, doc, onSnapshot, orderBy, getDoc } from 'firebase/firestore'
 
 export default {
     name: 'homeView',
@@ -49,7 +49,7 @@ export default {
         const user = localStorage.getItem('devpost');
         this.user = JSON.parse(user);
 
-        onSnapshot(collection(db, "posts"),
+        onSnapshot(collection(db, "posts"), orderBy("created", "asc"),
             (snapshot) => {
                 this.posts = []
                 snapshot.forEach(item =>
@@ -63,7 +63,6 @@ export default {
                         userId: item.data().userId
                     })
                 })
-                console.log(this.posts)
                 this.loading = false
             })
     },
@@ -91,17 +90,30 @@ export default {
                 {
                     console.log("erro ao criar o post: "+e)
                 })
+        },
+        Max200Length(string){
+            if(string.length > 200)
+            {
+                return string.substring(0, 200)+"..."
+            }
+            return string
+        },
+        async likePost(id, likes){
+            const userId = this.user.uid
+            const likeId = userId+"_"+id
+
+            const document = await getDoc(doc(collection(db, 'likes'), likeId))
+            if(document.data() !== undefined)
+            {
+                setDoc(doc(db, "posts", id), 
+                {
+                    likes: likes+1
+                })
+            }
         }
     },
     computed: {
-        postLength(valor)
-        {
-            if(valor.length < 200)
-            {
-                return valor
-            }
-            return `${valor.substring(0, 200)}...`
-        }
+
     }
 }
 </script>
