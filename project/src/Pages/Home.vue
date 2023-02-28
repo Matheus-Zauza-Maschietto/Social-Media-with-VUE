@@ -108,9 +108,7 @@ export default {
         async likePost(id, likes){
             const userId = this.user.uid
             const likeId = userId+"_"+id
-            console.log(likeId)
             const document = await getDoc(doc(collection(db, 'likes'), likeId))
-            console.log(document.exists())
             if(document.exists())
             {
                 updateDoc(doc(db, "posts", id), 
@@ -147,6 +145,12 @@ export default {
     display: flex;
     flex-direction: row;
     margin: 25px;
+}
+
+a{
+    text-decoration: none;
+    color: #FFB800;
+
 }
 
 @import "./home.css"

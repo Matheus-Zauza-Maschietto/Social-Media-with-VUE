@@ -62,7 +62,7 @@ export default {
                 {
                     console.log("ERRO AO CADASTRAR: "+e)
                 })
-            this.$router.push('/')
+            this.login = true
         },
         async handleLogin(){
             const {user} = await signInWithEmailAndPassword(getAuth(app), this.email, this.password);

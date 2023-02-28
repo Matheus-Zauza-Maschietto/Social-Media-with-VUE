@@ -1,6 +1,6 @@
 <template>
     <header id="header">
-        <router-link to="/">SujeitoPost</router-link>
+        <router-link to="/">Social Program</router-link>
         <router-link to="/dashboard" class="button">Dashboard</router-link>
     </header>
   </template>

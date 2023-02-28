@@ -96,6 +96,7 @@
     color:#FFF;
     padding-right: 25px;
 }
+
 .postarea h1{
     color:#FFF;
     padding-right: 25px;
@@ -108,9 +109,11 @@
 .headerPerfil h2{
     color: #FFF;
 }
+
 .headerPerfil span{
     color: #FFF;
 }
+
 .headerPerfil span strong{
     color: #FFB800;
 }
